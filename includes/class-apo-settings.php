@@ -34,9 +34,9 @@ class APO_Settings {
 			'type'              => 'array',
 			'sanitize_callback' => [ __CLASS__, 'sanitize_settings' ],
 			'default'           => [
-				'post_types' => [],
-				'taxonomies' => [],
-				'term_order' => [],
+				'post_types'  => [],
+				'taxonomies'  => [],
+				'term_order'  => [],
 			],
 		] );
 	}
@@ -49,9 +49,9 @@ class APO_Settings {
 	 */
 	public static function sanitize_settings( $input ) {
 		$sanitized = [
-			'post_types' => [],
-			'taxonomies' => [],
-			'term_order' => [],
+			'post_types'  => [],
+			'taxonomies'  => [],
+			'term_order'  => [],
 		];
 
 		if ( ! empty( $input['post_types'] ) && is_array( $input['post_types'] ) ) {
@@ -134,10 +134,10 @@ class APO_Settings {
 	 * Render the settings page.
 	 */
 	public static function render_page() {
-		$settings       = APO_Core::get_settings();
-		$enabled_pts    = $settings['post_types'];
-		$enabled_taxs   = $settings['taxonomies'];
-		$enabled_torder = $settings['term_order'];
+		$settings        = APO_Core::get_settings();
+		$enabled_pts     = $settings['post_types'];
+		$enabled_taxs    = $settings['taxonomies'];
+		$enabled_torder  = $settings['term_order'];
 
 		$post_types       = self::get_available_post_types();
 		$taxonomies       = self::get_all_taxonomies_with_post_types();
@@ -523,9 +523,9 @@ class APO_Settings {
 		</style>
 		<script>
 		document.addEventListener('DOMContentLoaded', function() {
-			var ptCheckboxes = document.querySelectorAll('input[name="apo_settings[post_types][]"]');
-			var taxToggles   = document.querySelectorAll('.apo-tax-toggle');
-			var emptyMsg     = document.getElementById('apo-tax-empty');
+			var ptCheckboxes  = document.querySelectorAll('input[name="apo_settings[post_types][]"]');
+			var taxToggles    = document.querySelectorAll('.apo-tax-toggle');
+			var emptyMsg      = document.getElementById('apo-tax-empty');
 
 			function updateTaxonomies() {
 				var activePts = [];

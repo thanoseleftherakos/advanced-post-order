@@ -11,18 +11,63 @@ class APO_Admin {
 		add_action( 'admin_enqueue_scripts', [ __CLASS__, 'enqueue_scripts' ] );
 		add_action( 'admin_notices', [ __CLASS__, 'conflict_notice' ] );
 		add_action( 'admin_notices', [ __CLASS__, 'term_mode_notice' ] );
+		add_action( 'admin_bar_menu', [ __CLASS__, 'admin_bar_indicator' ], 999 );
+
+		// Mark post type as stale when posts change.
+		add_action( 'save_post', [ __CLASS__, 'mark_stale' ], 10, 2 );
+		add_action( 'delete_post', [ __CLASS__, 'mark_stale_by_id' ] );
+		add_action( 'wp_trash_post', [ __CLASS__, 'mark_stale_by_id' ] );
+
+		// Order column for enabled post types.
+		$enabled_pts = APO_Core::get_enabled_post_types();
+		foreach ( $enabled_pts as $pt ) {
+			add_filter( "manage_{$pt}_posts_columns", [ __CLASS__, 'add_order_column' ] );
+			add_action( "manage_{$pt}_posts_custom_column", [ __CLASS__, 'render_order_column' ], 10, 2 );
+		}
 	}
 
 	/**
-	 * Refresh menu_order on admin_init for enabled post types.
+	 * Mark a post type as stale when a post is created, updated, or trashed.
 	 *
-	 * Detects gaps (new posts, deleted posts) and re-sequences
-	 * so drag-and-drop always starts from a clean state.
+	 * @param int     $post_id Post ID.
+	 * @param WP_Post $post    Post object.
+	 */
+	public static function mark_stale( $post_id, $post ) {
+		$enabled = APO_Core::get_enabled_post_types();
+		if ( in_array( $post->post_type, $enabled, true ) ) {
+			set_transient( 'apo_stale_' . $post->post_type, 1, HOUR_IN_SECONDS );
+		}
+	}
+
+	/**
+	 * Mark a post type as stale by post ID (for delete/trash hooks).
+	 *
+	 * @param int $post_id Post ID.
+	 */
+	public static function mark_stale_by_id( $post_id ) {
+		$post = get_post( $post_id );
+		if ( ! $post ) {
+			return;
+		}
+		$enabled = APO_Core::get_enabled_post_types();
+		if ( in_array( $post->post_type, $enabled, true ) ) {
+			set_transient( 'apo_stale_' . $post->post_type, 1, HOUR_IN_SECONDS );
+		}
+	}
+
+	/**
+	 * Refresh menu_order on admin_init only for stale post types.
+	 *
+	 * Only runs when a transient flag exists, then deletes it.
+	 * Eliminates 2 SQL queries per enabled post type on every admin page load.
 	 */
 	public static function refresh_order() {
 		$enabled = APO_Core::get_enabled_post_types();
 		foreach ( $enabled as $post_type ) {
-			APO_Core::refresh_post_type_order( $post_type );
+			if ( get_transient( 'apo_stale_' . $post_type ) ) {
+				APO_Core::refresh_post_type_order( $post_type );
+				delete_transient( 'apo_stale_' . $post_type );
+			}
 		}
 	}
 
@@ -32,6 +77,9 @@ class APO_Admin {
 	 * @return string|false 'global', 'term', or false if not applicable.
 	 */
 	private static function get_mode() {
+		if ( ! function_exists( 'get_current_screen' ) ) {
+			return false;
+		}
 		$screen = get_current_screen();
 		if ( ! $screen || $screen->base !== 'edit' ) {
 			return false;
@@ -71,25 +119,54 @@ class APO_Admin {
 				return;
 			}
 
+			$screen = get_current_screen();
+
 			// Dequeue SCPO scripts to prevent conflict
 			wp_dequeue_script( 'scporder' );
 			wp_dequeue_script( 'scpo-script' );
 
 			wp_enqueue_script( 'jquery-ui-sortable' );
 			wp_enqueue_script(
+				'apo-touch-punch',
+				APO_URL . 'assets/js/jquery.ui.touch-punch.min.js',
+				[ 'jquery-ui-sortable' ],
+				APO_VERSION,
+				true
+			);
+			wp_enqueue_script(
 				'apo-sortable',
 				APO_URL . 'assets/js/apo-sortable.js',
-				[ 'jquery', 'jquery-ui-sortable' ],
+				[ 'jquery', 'jquery-ui-sortable', 'apo-touch-punch' ],
 				APO_VERSION,
 				true
 			);
 
 			$localize_data = [
-				'ajax_url' => admin_url( 'admin-ajax.php' ),
-				'nonce'    => wp_create_nonce( 'apo_nonce' ),
-				'mode'     => $mode,
-				'term_id'  => 0,
+				'ajax_url'  => admin_url( 'admin-ajax.php' ),
+				'nonce'     => wp_create_nonce( 'apo_nonce' ),
+				'mode'      => $mode,
+				'term_id'   => 0,
 				'term_name' => '',
+				'post_type' => $screen->post_type,
+				'i18n'      => [
+					'order_saved'           => __( 'Order saved.', 'advanced-post-order' ),
+					'undo'                  => __( 'Undo', 'advanced-post-order' ),
+					'order_reverted'        => __( 'Order reverted.', 'advanced-post-order' ),
+					'save_failed'           => __( 'Failed to save order.', 'advanced-post-order' ),
+					'reset_confirm'         => __( 'Are you sure you want to reset the order? This cannot be undone.', 'advanced-post-order' ),
+					'reset_success'         => __( 'Order has been reset.', 'advanced-post-order' ),
+					'reset_failed'          => __( 'Failed to reset order.', 'advanced-post-order' ),
+					'reset_order'           => __( 'Reset Order', 'advanced-post-order' ),
+					'date_desc'             => __( 'Date (newest first)', 'advanced-post-order' ),
+					'date_asc'              => __( 'Date (oldest first)', 'advanced-post-order' ),
+					'title_asc'             => __( 'Title (A-Z)', 'advanced-post-order' ),
+					'title_desc'            => __( 'Title (Z-A)', 'advanced-post-order' ),
+					'keyboard_activated'    => __( 'Reorder mode activated. Use arrow keys to move, Enter to save, Escape to cancel.', 'advanced-post-order' ),
+					'keyboard_moved_up'     => __( 'Moved up.', 'advanced-post-order' ),
+					'keyboard_moved_down'   => __( 'Moved down.', 'advanced-post-order' ),
+					'keyboard_saved'        => __( 'Position saved.', 'advanced-post-order' ),
+					'keyboard_cancelled'    => __( 'Reorder cancelled.', 'advanced-post-order' ),
+				],
 			];
 
 			if ( $mode === 'term' ) {
@@ -132,9 +209,16 @@ class APO_Admin {
 
 			wp_enqueue_script( 'jquery-ui-sortable' );
 			wp_enqueue_script(
+				'apo-touch-punch',
+				APO_URL . 'assets/js/jquery.ui.touch-punch.min.js',
+				[ 'jquery-ui-sortable' ],
+				APO_VERSION,
+				true
+			);
+			wp_enqueue_script(
 				'apo-taxonomy',
 				APO_URL . 'assets/js/apo-taxonomy.js',
-				[ 'jquery', 'jquery-ui-sortable' ],
+				[ 'jquery', 'jquery-ui-sortable', 'apo-touch-punch' ],
 				APO_VERSION,
 				true
 			);
@@ -142,6 +226,17 @@ class APO_Admin {
 			wp_localize_script( 'apo-taxonomy', 'apo_tax_vars', [
 				'ajax_url' => admin_url( 'admin-ajax.php' ),
 				'nonce'    => wp_create_nonce( 'apo_nonce' ),
+				'i18n'     => [
+					'order_saved'         => __( 'Term order saved.', 'advanced-post-order' ),
+					'undo'                => __( 'Undo', 'advanced-post-order' ),
+					'order_reverted'      => __( 'Order reverted.', 'advanced-post-order' ),
+					'save_failed'         => __( 'Failed to save term order.', 'advanced-post-order' ),
+					'keyboard_activated'  => __( 'Reorder mode activated. Use arrow keys to move, Enter to save, Escape to cancel.', 'advanced-post-order' ),
+					'keyboard_moved_up'   => __( 'Moved up.', 'advanced-post-order' ),
+					'keyboard_moved_down' => __( 'Moved down.', 'advanced-post-order' ),
+					'keyboard_saved'      => __( 'Position saved.', 'advanced-post-order' ),
+					'keyboard_cancelled'  => __( 'Reorder cancelled.', 'advanced-post-order' ),
+				],
 			] );
 
 			wp_enqueue_style(
@@ -208,7 +303,59 @@ class APO_Admin {
 	}
 
 	/**
-	 * Modify the admin query for ordering on edit.php.
-	 * Hooked via pre_get_posts in APO_Query to keep query logic centralized.
+	 * Add ordering mode indicator to admin bar.
+	 *
+	 * @param WP_Admin_Bar $wp_admin_bar Admin bar instance.
 	 */
+	public static function admin_bar_indicator( $wp_admin_bar ) {
+		$mode = self::get_mode();
+		if ( ! $mode ) {
+			return;
+		}
+
+		$label = $mode === 'term'
+			? __( 'APO: Per-Term Mode', 'advanced-post-order' )
+			: __( 'APO: Global Mode', 'advanced-post-order' );
+
+		$wp_admin_bar->add_node( [
+			'id'    => 'apo-mode',
+			'title' => $label,
+			'href'  => admin_url( 'options-general.php?page=advanced-post-order' ),
+			'meta'  => [ 'class' => 'apo-admin-bar-mode' ],
+		] );
+	}
+
+	/**
+	 * Add order position "#" column to post list table.
+	 *
+	 * @param array $columns Existing columns.
+	 * @return array
+	 */
+	public static function add_order_column( $columns ) {
+		$new_columns = [];
+		foreach ( $columns as $key => $label ) {
+			if ( $key === 'cb' ) {
+				$new_columns[ $key ] = $label;
+				$new_columns['apo_order'] = '#';
+				continue;
+			}
+			$new_columns[ $key ] = $label;
+		}
+		return $new_columns;
+	}
+
+	/**
+	 * Render order position column value.
+	 *
+	 * @param string $column  Column name.
+	 * @param int    $post_id Post ID.
+	 */
+	public static function render_order_column( $column, $post_id ) {
+		if ( $column === 'apo_order' ) {
+			$post = get_post( $post_id );
+			if ( $post && ! is_wp_error( $post ) ) {
+				echo (int) $post->menu_order;
+			}
+		}
+	}
 }

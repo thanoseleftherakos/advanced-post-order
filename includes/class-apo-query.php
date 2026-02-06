@@ -27,6 +27,45 @@ class APO_Query {
 		}
 
 		$post_type = $query->get( 'post_type' );
+
+		// On frontend taxonomy archives, post_type may be empty.
+		// Detect enabled taxonomy query vars and infer the post type.
+		if ( empty( $post_type ) && ! is_admin() ) {
+			$enabled_taxonomies = APO_Core::get_enabled_taxonomies();
+			$enabled            = APO_Core::get_enabled_post_types();
+
+			foreach ( $enabled_taxonomies as $taxonomy ) {
+				$tax_obj = get_taxonomy( $taxonomy );
+				if ( ! $tax_obj || ! $tax_obj->query_var ) {
+					continue;
+				}
+				if ( $query->get( $tax_obj->query_var ) ) {
+					$matching = array_intersect( $tax_obj->object_type, $enabled );
+					if ( ! empty( $matching ) ) {
+						$query->set( 'orderby', 'menu_order' );
+						$query->set( 'order', 'ASC' );
+						return;
+					}
+				}
+			}
+
+			// Also check via queried object for taxonomy archives.
+			$queried = get_queried_object();
+			if ( $queried instanceof WP_Term ) {
+				$tax_obj = get_taxonomy( $queried->taxonomy );
+				if ( $tax_obj ) {
+					$matching = array_intersect( $tax_obj->object_type, $enabled );
+					if ( count( $matching ) === 1 ) {
+						$post_type = reset( $matching );
+					}
+				}
+			}
+
+			if ( empty( $post_type ) ) {
+				return;
+			}
+		}
+
 		if ( empty( $post_type ) ) {
 			return;
 		}

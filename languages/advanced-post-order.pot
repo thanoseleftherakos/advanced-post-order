@@ -2,7 +2,7 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Advanced Post Order 1.0.0\n"
+"Project-Id-Version: Advanced Post Order 1.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-01-01 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
@@ -13,6 +13,10 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: advanced-post-order.php
+msgid "Settings"
+msgstr ""
+
 #: includes/class-apo-settings.php
 msgid "Advanced Post Order"
 msgstr ""
@@ -22,11 +26,7 @@ msgid "Post Types"
 msgstr ""
 
 #: includes/class-apo-settings.php
-msgid "Select post types to enable global drag-and-drop ordering via menu_order."
-msgstr ""
-
-#: includes/class-apo-settings.php
-msgid "Enable ordering for"
+msgid "Global drag-and-drop ordering via menu_order"
 msgstr ""
 
 #: includes/class-apo-settings.php
@@ -34,31 +34,23 @@ msgid "Per-Term Post Ordering"
 msgstr ""
 
 #: includes/class-apo-settings.php
-msgid "Select taxonomies to enable per-term post ordering. When filtering by a term on the admin list, you can drag posts into a custom order for that specific term."
+msgid "Different post order within each taxonomy term"
 msgstr ""
 
 #: includes/class-apo-settings.php
-msgid "Enable per-term ordering for"
+msgid "Enable at least one post type above to see available taxonomies."
 msgstr ""
 
 #: includes/class-apo-settings.php
-msgid "Enable at least one post type above first."
+msgid "Term Ordering"
 msgstr ""
 
 #: includes/class-apo-settings.php
-msgid "No taxonomies found for the enabled post types."
+msgid "Reorder taxonomy terms via drag-and-drop"
 msgstr ""
 
 #: includes/class-apo-settings.php
-msgid "Taxonomy Term Ordering"
-msgstr ""
-
-#: includes/class-apo-settings.php
-msgid "Select taxonomies whose terms can be reordered via drag-and-drop on their admin page."
-msgstr ""
-
-#: includes/class-apo-settings.php
-msgid "Enable term reordering for"
+msgid "Save Changes"
 msgstr ""
 
 #: includes/class-apo-admin.php
@@ -67,6 +59,74 @@ msgstr ""
 
 #: includes/class-apo-admin.php
 msgid "Drag to reorder %1$s in \"%2$s\". Changes save automatically."
+msgstr ""
+
+#: includes/class-apo-admin.php
+msgid "APO: Per-Term Mode"
+msgstr ""
+
+#: includes/class-apo-admin.php
+msgid "APO: Global Mode"
+msgstr ""
+
+#: includes/class-apo-admin.php
+msgid "Order saved."
+msgstr ""
+
+#: includes/class-apo-admin.php
+msgid "Undo"
+msgstr ""
+
+#: includes/class-apo-admin.php
+msgid "Order reverted."
+msgstr ""
+
+#: includes/class-apo-admin.php
+msgid "Failed to save order."
+msgstr ""
+
+#: includes/class-apo-admin.php
+msgid "Are you sure you want to reset the order? This cannot be undone."
+msgstr ""
+
+#: includes/class-apo-admin.php
+msgid "Order has been reset."
+msgstr ""
+
+#: includes/class-apo-admin.php
+msgid "Failed to reset order."
+msgstr ""
+
+#: includes/class-apo-admin.php
+msgid "Reset Order"
+msgstr ""
+
+#: includes/class-apo-admin.php
+msgid "Reorder mode activated. Use arrow keys to move, Enter to save, Escape to cancel."
+msgstr ""
+
+#: includes/class-apo-admin.php
+msgid "Moved up."
+msgstr ""
+
+#: includes/class-apo-admin.php
+msgid "Moved down."
+msgstr ""
+
+#: includes/class-apo-admin.php
+msgid "Position saved."
+msgstr ""
+
+#: includes/class-apo-admin.php
+msgid "Reorder cancelled."
+msgstr ""
+
+#: includes/class-apo-admin.php
+msgid "Term order saved."
+msgstr ""
+
+#: includes/class-apo-admin.php
+msgid "Failed to save term order."
 msgstr ""
 
 #: includes/class-apo-ajax.php
@@ -83,4 +143,20 @@ msgstr ""
 
 #: includes/class-apo-ajax.php
 msgid "Missing order data or term ID."
+msgstr ""
+
+#: includes/class-apo-ajax.php
+msgid "Invalid term ID."
+msgstr ""
+
+#: includes/class-apo-ajax.php
+msgid "Invalid post type."
+msgstr ""
+
+#: includes/class-apo-ajax.php
+msgid "Post type not enabled."
+msgstr ""
+
+#: includes/class-apo-ajax.php
+msgid "Invalid reset type."
 msgstr ""

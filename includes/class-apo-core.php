@@ -13,9 +13,9 @@ class APO_Core {
 	 */
 	public static function get_settings() {
 		return get_option( 'apo_settings', [
-			'post_types' => [],
-			'taxonomies' => [],
-			'term_order' => [],
+			'post_types'  => [],
+			'taxonomies'  => [],
+			'term_order'  => [],
 		] );
 	}
 
@@ -230,4 +230,5 @@ class APO_Core {
 
 		return false;
 	}
+
 }

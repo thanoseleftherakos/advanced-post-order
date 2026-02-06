@@ -10,6 +10,7 @@ class APO_Ajax {
 		add_action( 'wp_ajax_apo_save_global_order', [ __CLASS__, 'save_global_order' ] );
 		add_action( 'wp_ajax_apo_save_term_post_order', [ __CLASS__, 'save_term_post_order' ] );
 		add_action( 'wp_ajax_apo_save_term_order', [ __CLASS__, 'save_term_order' ] );
+		add_action( 'wp_ajax_apo_reset_order', [ __CLASS__, 'reset_order' ] );
 	}
 
 	/**
@@ -161,5 +162,103 @@ class APO_Ajax {
 		do_action( 'apo_term_order_updated', $term_ids );
 
 		wp_send_json_success();
+	}
+
+	/**
+	 * Reset post order (global or per-term).
+	 */
+	public static function reset_order() {
+		check_ajax_referer( 'apo_nonce', 'nonce' );
+
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			wp_send_json_error( __( 'Permission denied.', 'advanced-post-order' ) );
+		}
+
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized below.
+		$reset_type = isset( $_POST['reset_type'] ) ? sanitize_key( $_POST['reset_type'] ) : '';
+		$sort_by    = isset( $_POST['sort_by'] ) ? sanitize_key( $_POST['sort_by'] ) : 'date_desc';
+
+		if ( $reset_type === 'term' ) {
+			$term_id = isset( $_POST['term_id'] ) ? absint( $_POST['term_id'] ) : 0;
+			if ( ! $term_id ) {
+				wp_send_json_error( __( 'Invalid term ID.', 'advanced-post-order' ) );
+			}
+
+			delete_term_meta( $term_id, '_apo_order' );
+
+			/**
+			 * Fires after per-term post order is reset.
+			 *
+			 * @param int $term_id The term ID.
+			 */
+			do_action( 'apo_term_post_order_reset', $term_id );
+
+			wp_send_json_success();
+		}
+
+		if ( $reset_type === 'global' ) {
+			$post_type = isset( $_POST['post_type'] ) ? sanitize_key( $_POST['post_type'] ) : '';
+			if ( empty( $post_type ) ) {
+				wp_send_json_error( __( 'Invalid post type.', 'advanced-post-order' ) );
+			}
+
+			$enabled = APO_Core::get_enabled_post_types();
+			if ( ! in_array( $post_type, $enabled, true ) ) {
+				wp_send_json_error( __( 'Post type not enabled.', 'advanced-post-order' ) );
+			}
+
+			global $wpdb;
+
+			$statuses = "'publish','pending','draft','private','future'";
+
+			switch ( $sort_by ) {
+				case 'date_asc':
+					$order_col = 'post_date ASC';
+					break;
+				case 'title_asc':
+					$order_col = 'post_title ASC';
+					break;
+				case 'title_desc':
+					$order_col = 'post_title DESC';
+					break;
+				case 'date_desc':
+				default:
+					$order_col = 'post_date DESC';
+					break;
+			}
+
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Reset requires fresh data.
+			$all_ids = $wpdb->get_col(
+				$wpdb->prepare(
+					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Static strings for statuses and order.
+					"SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_status IN ({$statuses}) ORDER BY {$order_col}",
+					$post_type
+				)
+			);
+
+			foreach ( $all_ids as $i => $pid ) {
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Bulk reset; cache cleared after.
+				$wpdb->update(
+					$wpdb->posts,
+					[ 'menu_order' => $i ],
+					[ 'ID' => (int) $pid ],
+					[ '%d' ],
+					[ '%d' ]
+				);
+				clean_post_cache( (int) $pid );
+			}
+
+			/**
+			 * Fires after global post order is reset.
+			 *
+			 * @param string $post_type The post type.
+			 * @param string $sort_by   The sort method used.
+			 */
+			do_action( 'apo_global_order_reset', $post_type, $sort_by );
+
+			wp_send_json_success();
+		}
+
+		wp_send_json_error( __( 'Invalid reset type.', 'advanced-post-order' ) );
 	}
 }

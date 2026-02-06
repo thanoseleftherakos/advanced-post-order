@@ -3,10 +3,29 @@
 /* Draggable rows */
 .apo-draggable {
 	cursor: grab;
+	position: relative;
 }
 
 .apo-draggable:active {
 	cursor: grabbing;
+}
+
+/* Drag handle — vertical dots on row hover */
+.apo-draggable td:first-child::before {
+	content: "\2807";
+	position: absolute;
+	left: 4px;
+	top: 50%;
+	transform: translateY(-50%);
+	font-size: 16px;
+	color: #c3c4c7;
+	opacity: 0;
+	transition: opacity 0.2s ease;
+	pointer-events: none;
+}
+
+.apo-draggable:hover td:first-child::before {
+	opacity: 1;
 }
 
 /* Sortable placeholder */
@@ -14,13 +33,26 @@
 	background-color: #f0f6fc;
 	border: 2px dashed #2271b1;
 	visibility: visible !important;
+	opacity: 0.6;
+	transition: opacity 0.2s ease;
 }
 
 /* Row being dragged */
 .ui-sortable-helper {
 	background-color: #fff;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
 	z-index: 999;
+	transform: scale(1.01);
+}
+
+/* Green highlight animation after save */
+@keyframes apo-highlight {
+	0%   { background-color: #e6f4ea; }
+	100% { background-color: transparent; }
+}
+
+.apo-highlight {
+	animation: apo-highlight 1s ease-out;
 }
 
 /* Term mode notice */
@@ -31,4 +63,72 @@
 /* AJAX notification */
 .apo-ajax-notice {
 	transition: opacity 0.3s ease;
+}
+
+/* Undo link */
+.apo-undo-link {
+	margin-left: 8px;
+	font-weight: 600;
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+/* Order position column */
+.column-apo_order {
+	width: 40px;
+	text-align: center;
+}
+
+/* Reset order controls */
+.apo-reset-wrap {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	margin-left: 8px;
+}
+
+.apo-reset-sort {
+	max-width: 180px;
+}
+
+/* Pagination warning */
+.apo-pagination-notice {
+	border-left-color: #dba617;
+}
+
+/* Keyboard active row */
+.apo-keyboard-active {
+	outline: 2px solid #2271b1 !important;
+	outline-offset: -2px;
+	background-color: #f0f6fc !important;
+}
+
+/* Focus ring for keyboard navigation */
+.apo-draggable:focus {
+	outline: 2px solid #2271b1;
+	outline-offset: -2px;
+	box-shadow: none;
+}
+
+.apo-draggable:focus:not(:focus-visible) {
+	outline: none;
+}
+
+.apo-draggable:focus-visible {
+	outline: 2px solid #2271b1;
+	outline-offset: -2px;
+}
+
+/* Touch targets — larger rows on coarse pointer devices */
+@media (pointer: coarse) {
+	.apo-draggable td {
+		min-height: 48px;
+		padding-top: 12px;
+		padding-bottom: 12px;
+	}
+
+	.apo-draggable td:first-child::before {
+		opacity: 0.5;
+		font-size: 20px;
+	}
 }
