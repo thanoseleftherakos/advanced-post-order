@@ -1,0 +1,165 @@
+<?php
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+class APO_Ajax {
+
+	public static function init() {
+		add_action( 'wp_ajax_apo_save_global_order', [ __CLASS__, 'save_global_order' ] );
+		add_action( 'wp_ajax_apo_save_term_post_order', [ __CLASS__, 'save_term_post_order' ] );
+		add_action( 'wp_ajax_apo_save_term_order', [ __CLASS__, 'save_term_order' ] );
+	}
+
+	/**
+	 * Save global post order (menu_order).
+	 */
+	public static function save_global_order() {
+		check_ajax_referer( 'apo_nonce', 'nonce' );
+
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			wp_send_json_error( __( 'Permission denied.', 'advanced-post-order' ) );
+		}
+
+		if ( empty( $_POST['order'] ) ) {
+			wp_send_json_error( __( 'No order data received.', 'advanced-post-order' ) );
+		}
+
+		parse_str( sanitize_text_field( wp_unslash( $_POST['order'] ) ), $data );
+
+		if ( empty( $data['post'] ) || ! is_array( $data['post'] ) ) {
+			wp_send_json_error( __( 'Invalid order data.', 'advanced-post-order' ) );
+		}
+
+		$post_ids = array_map( 'absint', $data['post'] );
+
+		global $wpdb;
+
+		// Get the current menu_order values for the dragged posts.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Immediate write follows.
+		$current_orders = $wpdb->get_results(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- Dynamic placeholder count for IN clause.
+			$wpdb->prepare(
+				"SELECT ID, menu_order FROM {$wpdb->posts} WHERE ID IN (" . implode( ',', array_fill( 0, count( $post_ids ), '%d' ) ) . ')',
+				...$post_ids
+			),
+			OBJECT_K
+		);
+
+		// Collect and sort the existing menu_order values.
+		$order_values = wp_list_pluck( $current_orders, 'menu_order' );
+		sort( $order_values, SORT_NUMERIC );
+
+		// Reassign sorted values in the new drag order.
+		foreach ( $post_ids as $i => $post_id ) {
+			$new_order = isset( $order_values[ $i ] ) ? $order_values[ $i ] : $i;
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Bulk reorder; clean_post_cache() called after.
+			$wpdb->update(
+				$wpdb->posts,
+				[ 'menu_order' => $new_order ],
+				[ 'ID' => $post_id ],
+				[ '%d' ],
+				[ '%d' ]
+			);
+			clean_post_cache( $post_id );
+		}
+
+		do_action( 'apo_global_order_updated', $post_ids );
+
+		wp_send_json_success();
+	}
+
+	/**
+	 * Save per-term post order.
+	 */
+	public static function save_term_post_order() {
+		check_ajax_referer( 'apo_nonce', 'nonce' );
+
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			wp_send_json_error( __( 'Permission denied.', 'advanced-post-order' ) );
+		}
+
+		if ( empty( $_POST['order'] ) || empty( $_POST['term_id'] ) ) {
+			wp_send_json_error( __( 'Missing order data or term ID.', 'advanced-post-order' ) );
+		}
+
+		parse_str( sanitize_text_field( wp_unslash( $_POST['order'] ) ), $data );
+
+		if ( empty( $data['post'] ) || ! is_array( $data['post'] ) ) {
+			wp_send_json_error( __( 'Invalid order data.', 'advanced-post-order' ) );
+		}
+
+		$term_id  = absint( $_POST['term_id'] );
+		$post_ids = array_map( 'absint', $data['post'] );
+
+		update_term_meta( $term_id, '_apo_order', $post_ids );
+
+		do_action( 'apo_term_post_order_updated', $term_id, $post_ids );
+
+		wp_send_json_success();
+	}
+
+	/**
+	 * Save taxonomy term order.
+	 */
+	public static function save_term_order() {
+		check_ajax_referer( 'apo_nonce', 'nonce' );
+
+		if ( ! current_user_can( 'manage_categories' ) ) {
+			wp_send_json_error( __( 'Permission denied.', 'advanced-post-order' ) );
+		}
+
+		if ( empty( $_POST['order'] ) ) {
+			wp_send_json_error( __( 'No order data received.', 'advanced-post-order' ) );
+		}
+
+		parse_str( sanitize_text_field( wp_unslash( $_POST['order'] ) ), $data );
+
+		if ( empty( $data['tag'] ) || ! is_array( $data['tag'] ) ) {
+			wp_send_json_error( __( 'Invalid order data.', 'advanced-post-order' ) );
+		}
+
+		$term_ids = array_map( 'absint', $data['tag'] );
+
+		global $wpdb;
+
+		// Get current term_order values.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Immediate write follows; caching would be stale.
+		$current_orders = $wpdb->get_results(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- Dynamic placeholder count for IN clause.
+			$wpdb->prepare(
+				"SELECT term_id, term_order FROM {$wpdb->terms} WHERE term_id IN (" . implode( ',', array_fill( 0, count( $term_ids ), '%d' ) ) . ')',
+				...$term_ids
+			),
+			OBJECT_K
+		);
+
+		// Collect and sort existing term_order values.
+		$order_values = wp_list_pluck( $current_orders, 'term_order' );
+		sort( $order_values, SORT_NUMERIC );
+
+		// If all values are 0, generate sequential values.
+		if ( count( array_unique( $order_values ) ) === 1 && reset( $order_values ) == 0 ) {
+			$order_values = range( 0, count( $term_ids ) - 1 );
+		}
+
+		// Reassign sorted values in new order.
+		foreach ( $term_ids as $i => $term_id ) {
+			$new_order = isset( $order_values[ $i ] ) ? $order_values[ $i ] : $i;
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Bulk reorder requires direct updates; clean_term_cache() called after.
+			$wpdb->update(
+				$wpdb->terms,
+				[ 'term_order' => $new_order ],
+				[ 'term_id' => $term_id ],
+				[ '%d' ],
+				[ '%d' ]
+			);
+			clean_term_cache( $term_id );
+		}
+
+		do_action( 'apo_term_order_updated', $term_ids );
+
+		wp_send_json_success();
+	}
+}

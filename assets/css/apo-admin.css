@@ -1,0 +1,34 @@
+/* Advanced Post Order — Admin Styles */
+
+/* Draggable rows */
+.apo-draggable {
+	cursor: grab;
+}
+
+.apo-draggable:active {
+	cursor: grabbing;
+}
+
+/* Sortable placeholder */
+.apo-sortable-placeholder {
+	background-color: #f0f6fc;
+	border: 2px dashed #2271b1;
+	visibility: visible !important;
+}
+
+/* Row being dragged */
+.ui-sortable-helper {
+	background-color: #fff;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+	z-index: 999;
+}
+
+/* Term mode notice */
+.apo-term-notice {
+	border-left-color: #2271b1;
+}
+
+/* AJAX notification */
+.apo-ajax-notice {
+	transition: opacity 0.3s ease;
+}

@@ -1,0 +1,86 @@
+# Copyright (C) 2025 Bracket
+# This file is distributed under the GPLv2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Advanced Post Order 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-01-01 00:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: includes/class-apo-settings.php
+msgid "Advanced Post Order"
+msgstr ""
+
+#: includes/class-apo-settings.php
+msgid "Post Types"
+msgstr ""
+
+#: includes/class-apo-settings.php
+msgid "Select post types to enable global drag-and-drop ordering via menu_order."
+msgstr ""
+
+#: includes/class-apo-settings.php
+msgid "Enable ordering for"
+msgstr ""
+
+#: includes/class-apo-settings.php
+msgid "Per-Term Post Ordering"
+msgstr ""
+
+#: includes/class-apo-settings.php
+msgid "Select taxonomies to enable per-term post ordering. When filtering by a term on the admin list, you can drag posts into a custom order for that specific term."
+msgstr ""
+
+#: includes/class-apo-settings.php
+msgid "Enable per-term ordering for"
+msgstr ""
+
+#: includes/class-apo-settings.php
+msgid "Enable at least one post type above first."
+msgstr ""
+
+#: includes/class-apo-settings.php
+msgid "No taxonomies found for the enabled post types."
+msgstr ""
+
+#: includes/class-apo-settings.php
+msgid "Taxonomy Term Ordering"
+msgstr ""
+
+#: includes/class-apo-settings.php
+msgid "Select taxonomies whose terms can be reordered via drag-and-drop on their admin page."
+msgstr ""
+
+#: includes/class-apo-settings.php
+msgid "Enable term reordering for"
+msgstr ""
+
+#: includes/class-apo-admin.php
+msgid "<strong>Advanced Post Order:</strong> Simple Custom Post Order is also active. To avoid conflicts, please deactivate Simple Custom Post Order."
+msgstr ""
+
+#: includes/class-apo-admin.php
+msgid "Drag to reorder %1$s in \"%2$s\". Changes save automatically."
+msgstr ""
+
+#: includes/class-apo-ajax.php
+msgid "Permission denied."
+msgstr ""
+
+#: includes/class-apo-ajax.php
+msgid "No order data received."
+msgstr ""
+
+#: includes/class-apo-ajax.php
+msgid "Invalid order data."
+msgstr ""
+
+#: includes/class-apo-ajax.php
+msgid "Missing order data or term ID."
+msgstr ""
