@@ -209,7 +209,8 @@ class Bracket_PO_Ajax {
 
 			global $wpdb;
 
-			$statuses = "'publish','pending','draft','private','future'";
+			$statuses_arr = array( 'publish', 'pending', 'draft', 'private', 'future' );
+			$placeholders = implode( ', ', array_fill( 0, count( $statuses_arr ), '%s' ) );
 
 			switch ( $sort_by ) {
 				case 'date_asc':
@@ -227,12 +228,13 @@ class Bracket_PO_Ajax {
 					break;
 			}
 
+			$order_col = esc_sql( $order_col );
+
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Reset requires fresh data.
 			$all_ids = $wpdb->get_col(
 				$wpdb->prepare(
-					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Static strings for statuses and order.
-					"SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_status IN ({$statuses}) ORDER BY {$order_col}",
-					$post_type
+					"SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_status IN ({$placeholders}) ORDER BY {$order_col}",
+					array_merge( array( $post_type ), $statuses_arr )
 				)
 			);
 

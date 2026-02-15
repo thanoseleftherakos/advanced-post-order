@@ -74,14 +74,14 @@ class Bracket_PO_Core {
 	public static function initialize_post_type_order( $post_type ) {
 		global $wpdb;
 
-		$statuses = "'publish','pending','draft','private','future'";
+		$statuses_arr  = array( 'publish', 'pending', 'draft', 'private', 'future' );
+		$placeholders  = implode( ', ', array_fill( 0, count( $statuses_arr ), '%s' ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- One-time initialization check.
 		$total = (int) $wpdb->get_var(
 			$wpdb->prepare(
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Static string of statuses.
-				"SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = %s AND post_status IN ({$statuses})",
-				$post_type
+				"SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = %s AND post_status IN ({$placeholders})",
+				array_merge( array( $post_type ), $statuses_arr )
 			)
 		);
 
@@ -92,9 +92,8 @@ class Bracket_PO_Core {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- One-time initialization check.
 		$max_order = (int) $wpdb->get_var(
 			$wpdb->prepare(
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Static string of statuses.
-				"SELECT MAX(menu_order) FROM {$wpdb->posts} WHERE post_type = %s AND post_status IN ({$statuses})",
-				$post_type
+				"SELECT MAX(menu_order) FROM {$wpdb->posts} WHERE post_type = %s AND post_status IN ({$placeholders})",
+				array_merge( array( $post_type ), $statuses_arr )
 			)
 		);
 
@@ -109,14 +108,13 @@ class Bracket_PO_Core {
 		}
 
 		// All posts have menu_order 0 — assign sequential values.
-		$order_col = ( $post_type === 'page' ) ? 'post_title ASC' : 'post_date DESC';
+		$order_col = esc_sql( ( $post_type === 'page' ) ? 'post_title ASC' : 'post_date DESC' );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Bulk initialization.
 		$all_ids = $wpdb->get_col(
 			$wpdb->prepare(
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Static strings for statuses and order column.
-				"SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_status IN ({$statuses}) ORDER BY {$order_col}",
-				$post_type
+				"SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_status IN ({$placeholders}) ORDER BY {$order_col}",
+				array_merge( array( $post_type ), $statuses_arr )
 			)
 		);
 
@@ -143,14 +141,14 @@ class Bracket_PO_Core {
 	public static function refresh_post_type_order( $post_type ) {
 		global $wpdb;
 
-		$statuses = "'publish','pending','draft','private','future'";
+		$statuses_arr  = array( 'publish', 'pending', 'draft', 'private', 'future' );
+		$placeholders  = implode( ', ', array_fill( 0, count( $statuses_arr ), '%s' ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Lightweight check on admin_init.
 		$total = (int) $wpdb->get_var(
 			$wpdb->prepare(
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Static string of statuses.
-				"SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = %s AND post_status IN ({$statuses})",
-				$post_type
+				"SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = %s AND post_status IN ({$placeholders})",
+				array_merge( array( $post_type ), $statuses_arr )
 			)
 		);
 
@@ -161,9 +159,8 @@ class Bracket_PO_Core {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Lightweight check on admin_init.
 		$max_order = (int) $wpdb->get_var(
 			$wpdb->prepare(
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Static string of statuses.
-				"SELECT MAX(menu_order) FROM {$wpdb->posts} WHERE post_type = %s AND post_status IN ({$statuses})",
-				$post_type
+				"SELECT MAX(menu_order) FROM {$wpdb->posts} WHERE post_type = %s AND post_status IN ({$placeholders})",
+				array_merge( array( $post_type ), $statuses_arr )
 			)
 		);
 
@@ -173,16 +170,17 @@ class Bracket_PO_Core {
 		}
 
 		// Re-sequence by current menu_order, then by date/title as tiebreaker.
-		$order_col = ( $post_type === 'page' )
-			? 'menu_order ASC, post_title ASC'
-			: 'menu_order ASC, post_date DESC';
+		$order_col = esc_sql(
+			( $post_type === 'page' )
+				? 'menu_order ASC, post_title ASC'
+				: 'menu_order ASC, post_date DESC'
+		);
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Refresh to fix gaps.
 		$all_ids = $wpdb->get_col(
 			$wpdb->prepare(
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Static strings for statuses and order.
-				"SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_status IN ({$statuses}) ORDER BY {$order_col}",
-				$post_type
+				"SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_status IN ({$placeholders}) ORDER BY {$order_col}",
+				array_merge( array( $post_type ), $statuses_arr )
 			)
 		);
 
