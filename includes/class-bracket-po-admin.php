@@ -120,17 +120,11 @@ class Bracket_PO_Admin {
 			wp_dequeue_script( 'scpo-script' );
 
 			wp_enqueue_script( 'jquery-ui-sortable' );
-			wp_enqueue_script(
-				'bracket-po-touch-punch',
-				BRACKET_PO_URL . 'assets/js/jquery.ui.touch-punch.min.js',
-				[ 'jquery-ui-sortable' ],
-				BRACKET_PO_VERSION,
-				true
-			);
+			wp_enqueue_script( 'jquery-touch-punch' );
 			wp_enqueue_script(
 				'bracket-po-sortable',
 				BRACKET_PO_URL . 'assets/js/bracket-po-sortable.js',
-				[ 'jquery', 'jquery-ui-sortable', 'bracket-po-touch-punch' ],
+				[ 'jquery', 'jquery-ui-sortable', 'jquery-touch-punch' ],
 				BRACKET_PO_VERSION,
 				true
 			);
@@ -202,17 +196,11 @@ class Bracket_PO_Admin {
 			wp_dequeue_script( 'scpo-script' );
 
 			wp_enqueue_script( 'jquery-ui-sortable' );
-			wp_enqueue_script(
-				'bracket-po-touch-punch',
-				BRACKET_PO_URL . 'assets/js/jquery.ui.touch-punch.min.js',
-				[ 'jquery-ui-sortable' ],
-				BRACKET_PO_VERSION,
-				true
-			);
+			wp_enqueue_script( 'jquery-touch-punch' );
 			wp_enqueue_script(
 				'bracket-po-taxonomy',
 				BRACKET_PO_URL . 'assets/js/bracket-po-taxonomy.js',
-				[ 'jquery', 'jquery-ui-sortable', 'bracket-po-touch-punch' ],
+				[ 'jquery', 'jquery-ui-sortable', 'jquery-touch-punch' ],
 				BRACKET_PO_VERSION,
 				true
 			);
