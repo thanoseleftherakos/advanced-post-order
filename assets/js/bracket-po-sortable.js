@@ -1,16 +1,16 @@
 (function($) {
 	'use strict';
 
-	if (typeof apo_vars === 'undefined') {
+	if (typeof bracket_po_vars === 'undefined') {
 		return;
 	}
 
-	var ajax_url  = apo_vars.ajax_url;
-	var nonce     = apo_vars.nonce;
-	var mode      = apo_vars.mode;
-	var term_id   = apo_vars.term_id;
-	var post_type = apo_vars.post_type;
-	var i18n      = apo_vars.i18n || {};
+	var ajax_url  = bracket_po_vars.ajax_url;
+	var nonce     = bracket_po_vars.nonce;
+	var mode      = bracket_po_vars.mode;
+	var term_id   = bracket_po_vars.term_id;
+	var post_type = bracket_po_vars.post_type;
+	var i18n      = bracket_po_vars.i18n || {};
 
 	var previousOrder = null;
 	var debounceTimer = null;
@@ -29,18 +29,18 @@
 	function showNotice(type, message, undoCallback) {
 		var $p = $('<p></p>').text(message);
 		if (undoCallback) {
-			var $undo = $('<a href="#" class="apo-undo-link"></a>').text(i18n.undo || 'Undo');
+			var $undo = $('<a href="#" class="bracket-po-undo-link"></a>').text(i18n.undo || 'Undo');
 			$p.append(' ').append($undo);
 		}
-		var $notice = $('<div class="notice notice-' + type + ' apo-ajax-notice"></div>').append($p);
+		var $notice = $('<div class="notice notice-' + type + ' bracket-po-ajax-notice"></div>').append($p);
 		if (undoCallback) {
-			$notice.find('.apo-undo-link').on('click', function(e) {
+			$notice.find('.bracket-po-undo-link').on('click', function(e) {
 				e.preventDefault();
 				$notice.remove();
 				undoCallback();
 			});
 		}
-		$('.apo-ajax-notice').remove();
+		$('.bracket-po-ajax-notice').remove();
 		$('.wrap > h1, .wrap > .wp-header-end').first().after($notice);
 		setTimeout(function() {
 			$notice.fadeOut(300, function() { $(this).remove(); });
@@ -49,7 +49,7 @@
 
 	// Send order via AJAX (used by both drag-and-drop and undo)
 	function saveOrder(serializedOrder, callback) {
-		var action = mode === 'term' ? 'apo_save_term_post_order' : 'apo_save_global_order';
+		var action = mode === 'term' ? 'bracket_po_save_term_post_order' : 'bracket_po_save_global_order';
 
 		var data = {
 			action: action,
@@ -70,24 +70,24 @@
 
 	// Highlight saved rows
 	function highlightRows($list) {
-		$list.find('tr').addClass('apo-highlight');
+		$list.find('tr').addClass('bracket-po-highlight');
 		setTimeout(function() {
-			$list.find('tr').removeClass('apo-highlight');
+			$list.find('tr').removeClass('bracket-po-highlight');
 		}, 1000);
 	}
 
 	// Update order column numbers
 	function updateOrderNumbers($list) {
 		$list.find('tr').each(function(index) {
-			$(this).find('.column-apo_order').text(index);
+			$(this).find('.column-bracket_po_order').text(index);
 		});
 	}
 
 	// ARIA live region for screen reader announcements
 	function announce(message) {
-		var $region = $('#apo-live-region');
+		var $region = $('#bracket-po-live-region');
 		if (!$region.length) {
-			$region = $('<div id="apo-live-region" class="screen-reader-text" aria-live="assertive" role="status"></div>');
+			$region = $('<div id="bracket-po-live-region" class="screen-reader-text" aria-live="assertive" role="status"></div>');
 			$('body').append($region);
 		}
 		$region.text(message);
@@ -105,14 +105,14 @@
 		var isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 
 		// --- Reset Order button (#6) ---
-		var $resetWrap = $('<div class="apo-reset-wrap alignleft actions"></div>');
-		var $sortSelect = $('<select class="apo-reset-sort">' +
+		var $resetWrap = $('<div class="bracket-po-reset-wrap alignleft actions"></div>');
+		var $sortSelect = $('<select class="bracket-po-reset-sort">' +
 			'<option value="date_desc">' + (i18n.date_desc || 'Date (newest first)') + '</option>' +
 			'<option value="date_asc">' + (i18n.date_asc || 'Date (oldest first)') + '</option>' +
 			'<option value="title_asc">' + (i18n.title_asc || 'Title (A-Z)') + '</option>' +
 			'<option value="title_desc">' + (i18n.title_desc || 'Title (Z-A)') + '</option>' +
 			'</select>');
-		var $resetBtn = $('<button type="button" class="button apo-reset-btn">' +
+		var $resetBtn = $('<button type="button" class="button bracket-po-reset-btn">' +
 			(i18n.reset_order || 'Reset Order') + '</button>');
 
 		$resetWrap.append($sortSelect).append($resetBtn);
@@ -124,7 +124,7 @@
 			}
 
 			var resetData = {
-				action: 'apo_reset_order',
+				action: 'bracket_po_reset_order',
 				nonce: nonce,
 				reset_type: mode === 'term' ? 'term' : 'global',
 				sort_by: $sortSelect.val(),
@@ -152,7 +152,7 @@
 			items: 'tr',
 			axis: 'y',
 			helper: fixHelper,
-			placeholder: 'apo-sortable-placeholder',
+			placeholder: 'bracket-po-sortable-placeholder',
 			cursor: 'grabbing',
 			opacity: 0.8,
 			tolerance: 'pointer',
@@ -222,7 +222,7 @@
 
 		// Add drag cursor class and accessibility attributes (#11)
 		$list.find('tr').each(function() {
-			$(this).addClass('apo-draggable')
+			$(this).addClass('bracket-po-draggable')
 				.attr('tabindex', '0')
 				.attr('role', 'listitem');
 		});
@@ -238,7 +238,7 @@
 				keyboardActiveRow = $row;
 				keyboardOriginalIndex = $row.index();
 				previousOrder = $list.sortable('serialize');
-				$row.addClass('apo-keyboard-active');
+				$row.addClass('bracket-po-keyboard-active');
 				announce(i18n.keyboard_activated || 'Reorder mode activated. Use arrow keys to move, Enter to save, Escape to cancel.');
 				return;
 			}
@@ -274,7 +274,7 @@
 			// Enter: save position
 			if (e.key === 'Enter') {
 				e.preventDefault();
-				$row.removeClass('apo-keyboard-active');
+				$row.removeClass('bracket-po-keyboard-active');
 				var savedPrev = previousOrder;
 				keyboardActiveRow = null;
 
@@ -304,7 +304,7 @@
 			// Escape: cancel
 			if (e.key === 'Escape') {
 				e.preventDefault();
-				$row.removeClass('apo-keyboard-active');
+				$row.removeClass('bracket-po-keyboard-active');
 				keyboardActiveRow = null;
 
 				// Restore original position

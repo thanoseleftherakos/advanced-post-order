@@ -1,17 +1,17 @@
-/* Advanced Post Order — Admin Styles */
+/* Bracket Post Order — Admin Styles */
 
 /* Draggable rows */
-.apo-draggable {
+.bracket-po-draggable {
 	cursor: grab;
 	position: relative;
 }
 
-.apo-draggable:active {
+.bracket-po-draggable:active {
 	cursor: grabbing;
 }
 
 /* Drag handle — vertical dots on row hover */
-.apo-draggable td:first-child::before {
+.bracket-po-draggable td:first-child::before {
 	content: "\2807";
 	position: absolute;
 	left: 4px;
@@ -24,12 +24,12 @@
 	pointer-events: none;
 }
 
-.apo-draggable:hover td:first-child::before {
+.bracket-po-draggable:hover td:first-child::before {
 	opacity: 1;
 }
 
 /* Sortable placeholder */
-.apo-sortable-placeholder {
+.bracket-po-sortable-placeholder {
 	background-color: #f0f6fc;
 	border: 2px dashed #2271b1;
 	visibility: visible !important;
@@ -46,27 +46,27 @@
 }
 
 /* Green highlight animation after save */
-@keyframes apo-highlight {
+@keyframes bracket-po-highlight {
 	0%   { background-color: #e6f4ea; }
 	100% { background-color: transparent; }
 }
 
-.apo-highlight {
-	animation: apo-highlight 1s ease-out;
+.bracket-po-highlight {
+	animation: bracket-po-highlight 1s ease-out;
 }
 
 /* Term mode notice */
-.apo-term-notice {
+.bracket-po-term-notice {
 	border-left-color: #2271b1;
 }
 
 /* AJAX notification */
-.apo-ajax-notice {
+.bracket-po-ajax-notice {
 	transition: opacity 0.3s ease;
 }
 
 /* Undo link */
-.apo-undo-link {
+.bracket-po-undo-link {
 	margin-left: 8px;
 	font-weight: 600;
 	text-decoration: underline;
@@ -74,60 +74,60 @@
 }
 
 /* Order position column */
-.column-apo_order {
+.column-bracket_po_order {
 	width: 40px;
 	text-align: center;
 }
 
 /* Reset order controls */
-.apo-reset-wrap {
+.bracket-po-reset-wrap {
 	display: inline-flex;
 	align-items: center;
 	gap: 4px;
 	margin-left: 8px;
 }
 
-.apo-reset-sort {
+.bracket-po-reset-sort {
 	max-width: 180px;
 }
 
 /* Pagination warning */
-.apo-pagination-notice {
+.bracket-po-pagination-notice {
 	border-left-color: #dba617;
 }
 
 /* Keyboard active row */
-.apo-keyboard-active {
+.bracket-po-keyboard-active {
 	outline: 2px solid #2271b1 !important;
 	outline-offset: -2px;
 	background-color: #f0f6fc !important;
 }
 
 /* Focus ring for keyboard navigation */
-.apo-draggable:focus {
+.bracket-po-draggable:focus {
 	outline: 2px solid #2271b1;
 	outline-offset: -2px;
 	box-shadow: none;
 }
 
-.apo-draggable:focus:not(:focus-visible) {
+.bracket-po-draggable:focus:not(:focus-visible) {
 	outline: none;
 }
 
-.apo-draggable:focus-visible {
+.bracket-po-draggable:focus-visible {
 	outline: 2px solid #2271b1;
 	outline-offset: -2px;
 }
 
 /* Touch targets — larger rows on coarse pointer devices */
 @media (pointer: coarse) {
-	.apo-draggable td {
+	.bracket-po-draggable td {
 		min-height: 48px;
 		padding-top: 12px;
 		padding-bottom: 12px;
 	}
 
-	.apo-draggable td:first-child::before {
+	.bracket-po-draggable td:first-child::before {
 		opacity: 0.5;
 		font-size: 20px;
 	}

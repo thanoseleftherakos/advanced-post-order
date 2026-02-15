@@ -4,7 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class APO_Core {
+class Bracket_PO_Core {
 
 	/**
 	 * Get plugin settings.
@@ -12,7 +12,7 @@ class APO_Core {
 	 * @return array
 	 */
 	public static function get_settings() {
-		return get_option( 'apo_settings', [
+		return get_option( 'bracket_po_settings', [
 			'post_types'  => [],
 			'taxonomies'  => [],
 			'term_order'  => [],
@@ -56,7 +56,7 @@ class APO_Core {
 	 * @return array Array of post IDs in order.
 	 */
 	public static function get_term_order( $term_id ) {
-		$order = get_term_meta( $term_id, '_apo_order', true );
+		$order = get_term_meta( $term_id, '_bracket_po_order', true );
 		if ( ! is_array( $order ) || empty( $order ) ) {
 			return [];
 		}

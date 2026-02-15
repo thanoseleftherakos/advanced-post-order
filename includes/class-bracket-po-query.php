@@ -4,7 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class APO_Query {
+class Bracket_PO_Query {
 
 	public static function init() {
 		add_action( 'pre_get_posts', [ __CLASS__, 'set_menu_order' ] );
@@ -31,8 +31,8 @@ class APO_Query {
 		// On frontend taxonomy archives, post_type may be empty.
 		// Detect enabled taxonomy query vars and infer the post type.
 		if ( empty( $post_type ) && ! is_admin() ) {
-			$enabled_taxonomies = APO_Core::get_enabled_taxonomies();
-			$enabled            = APO_Core::get_enabled_post_types();
+			$enabled_taxonomies = Bracket_PO_Core::get_enabled_taxonomies();
+			$enabled            = Bracket_PO_Core::get_enabled_post_types();
 
 			foreach ( $enabled_taxonomies as $taxonomy ) {
 				$tax_obj = get_taxonomy( $taxonomy );
@@ -78,7 +78,7 @@ class APO_Query {
 			$post_type = reset( $post_type );
 		}
 
-		$enabled = APO_Core::get_enabled_post_types();
+		$enabled = Bracket_PO_Core::get_enabled_post_types();
 		if ( ! in_array( $post_type, $enabled, true ) ) {
 			return;
 		}
@@ -128,13 +128,13 @@ class APO_Query {
 		$taxonomy = $term_data['taxonomy'];
 
 		// Check if this taxonomy is enabled for per-term ordering
-		$enabled_taxonomies = APO_Core::get_enabled_taxonomies();
+		$enabled_taxonomies = Bracket_PO_Core::get_enabled_taxonomies();
 		if ( ! in_array( $taxonomy, $enabled_taxonomies, true ) ) {
 			return $clauses;
 		}
 
 		// Get saved order
-		$ordered_ids = APO_Core::get_term_order( $term_id );
+		$ordered_ids = Bracket_PO_Core::get_term_order( $term_id );
 
 		/**
 		 * Filter the retrieved per-term post order before it's applied.
@@ -142,7 +142,7 @@ class APO_Query {
 		 * @param array $ordered_ids Array of post IDs in order.
 		 * @param int   $term_id     The term ID.
 		 */
-		$ordered_ids = apply_filters( 'apo_get_term_post_order', $ordered_ids, $term_id );
+		$ordered_ids = apply_filters( 'bracket_po_get_term_post_order', $ordered_ids, $term_id );
 
 		if ( empty( $ordered_ids ) ) {
 			return $clauses;
@@ -155,7 +155,7 @@ class APO_Query {
 		 * @param int      $term_id  The term ID.
 		 * @param WP_Query $query    The query object.
 		 */
-		if ( ! apply_filters( 'apo_apply_term_post_order', true, $term_id, $query ) ) {
+		if ( ! apply_filters( 'bracket_po_apply_term_post_order', true, $term_id, $query ) ) {
 			return $clauses;
 		}
 
@@ -178,7 +178,7 @@ class APO_Query {
 		$tax_query = $query->get( 'tax_query' );
 
 		// Check for simple taxonomy query vars (e.g., 'category_name', 'tag', custom taxonomy slugs)
-		$enabled_taxonomies = APO_Core::get_enabled_taxonomies();
+		$enabled_taxonomies = Bracket_PO_Core::get_enabled_taxonomies();
 		foreach ( $enabled_taxonomies as $taxonomy ) {
 			$tax_obj = get_taxonomy( $taxonomy );
 			if ( ! $tax_obj ) {
@@ -270,13 +270,13 @@ class APO_Query {
 	 * @return string
 	 */
 	public static function filter_terms_orderby( $orderby, $query_vars, $taxonomies ) {
-		$enabled = APO_Core::get_enabled_term_order_taxonomies();
+		$enabled = Bracket_PO_Core::get_enabled_term_order_taxonomies();
 		if ( empty( $enabled ) ) {
 			return $orderby;
 		}
 
 		// Only override if the query is for a single enabled taxonomy and no explicit orderby
-		if ( count( $taxonomies ) !== 1 ) {
+		if ( ! is_array( $taxonomies ) || count( $taxonomies ) !== 1 ) {
 			return $orderby;
 		}
 
@@ -303,7 +303,7 @@ class APO_Query {
 	 * @return array
 	 */
 	public static function sort_object_terms( $terms, $object_ids, $taxonomies, $args ) {
-		$enabled = APO_Core::get_enabled_term_order_taxonomies();
+		$enabled = Bracket_PO_Core::get_enabled_term_order_taxonomies();
 		if ( empty( $enabled ) || empty( $terms ) ) {
 			return $terms;
 		}

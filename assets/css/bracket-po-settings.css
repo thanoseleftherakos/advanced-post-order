@@ -1,0 +1,213 @@
+/* Bracket Post Order — Settings Page Styles */
+
+/* Reset WP admin defaults for our page */
+.bracket-po-settings-wrap {
+	max-width: 860px;
+	margin: 0;
+}
+
+/* Header */
+.bracket-po-header {
+	background: #1d2327;
+	margin: -1px -1px 0 -20px;
+	padding: 0 20px;
+}
+.bracket-po-header__inner {
+	max-width: 860px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 18px 0;
+}
+.bracket-po-header__title {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	color: #fff;
+}
+.bracket-po-header__title h1 {
+	color: #fff;
+	font-size: 18px;
+	font-weight: 500;
+	margin: 0;
+	padding: 0;
+	letter-spacing: -0.01em;
+}
+.bracket-po-header__title svg {
+	flex-shrink: 0;
+}
+.bracket-po-header__version {
+	font-size: 11px;
+	color: rgba(255,255,255,0.45);
+	background: rgba(255,255,255,0.08);
+	padding: 3px 8px;
+	border-radius: 4px;
+	font-weight: 500;
+}
+
+/* Grid */
+.bracket-po-grid {
+	display: grid;
+	gap: 16px;
+	margin-top: 24px;
+}
+
+/* Cards */
+.bracket-po-card {
+	background: #fff;
+	border: 1px solid #dcdde1;
+	border-radius: 8px;
+	overflow: hidden;
+}
+.bracket-po-card__header {
+	display: flex;
+	align-items: flex-start;
+	gap: 14px;
+	padding: 20px 24px 16px;
+	border-bottom: 1px solid #f0f0f1;
+}
+.bracket-po-card__icon {
+	width: 40px;
+	height: 40px;
+	border-radius: 10px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+}
+.bracket-po-card__icon--blue {
+	background: #e7f0fe;
+	color: #2271b1;
+}
+.bracket-po-card__icon--purple {
+	background: #f0e7fe;
+	color: #7e3bd0;
+}
+.bracket-po-card__icon--green {
+	background: #e2f5ea;
+	color: #1a8a42;
+}
+.bracket-po-card__title {
+	font-size: 14px;
+	font-weight: 600;
+	margin: 0 0 2px;
+	padding: 0;
+	color: #1d2327;
+}
+.bracket-po-card__subtitle {
+	font-size: 12.5px;
+	color: #646970;
+	margin: 0;
+}
+.bracket-po-card__body {
+	padding: 4px 0;
+}
+
+/* Toggle rows */
+.bracket-po-toggle {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 12px 24px;
+	cursor: pointer;
+	transition: background-color 0.15s ease;
+	border-bottom: 1px solid #f6f7f7;
+	gap: 16px;
+}
+.bracket-po-toggle:last-child {
+	border-bottom: 0;
+}
+.bracket-po-toggle:hover {
+	background-color: #f9f9f9;
+}
+.bracket-po-toggle__text {
+	display: flex;
+	flex-direction: column;
+	gap: 1px;
+	min-width: 0;
+}
+.bracket-po-toggle__label {
+	font-size: 13px;
+	font-weight: 500;
+	color: #1d2327;
+}
+.bracket-po-toggle__slug {
+	font-size: 11.5px;
+	color: #898d91;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+/* Toggle switch */
+.bracket-po-toggle__switch {
+	position: relative;
+	width: 38px;
+	height: 22px;
+	flex-shrink: 0;
+}
+.bracket-po-toggle__switch input {
+	opacity: 0;
+	width: 0;
+	height: 0;
+	position: absolute;
+}
+.bracket-po-toggle__slider {
+	position: absolute;
+	inset: 0;
+	background-color: #c3c4c7;
+	border-radius: 22px;
+	transition: background-color 0.2s ease;
+	cursor: pointer;
+}
+.bracket-po-toggle__slider::before {
+	content: "";
+	position: absolute;
+	height: 16px;
+	width: 16px;
+	left: 3px;
+	bottom: 3px;
+	background-color: #fff;
+	border-radius: 50%;
+	transition: transform 0.2s ease;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+.bracket-po-toggle__switch input:checked + .bracket-po-toggle__slider {
+	background-color: #2271b1;
+}
+.bracket-po-toggle__switch input:checked + .bracket-po-toggle__slider::before {
+	transform: translateX(16px);
+}
+.bracket-po-toggle__switch input:focus-visible + .bracket-po-toggle__slider {
+	outline: 2px solid #2271b1;
+	outline-offset: 2px;
+}
+
+/* Empty state */
+.bracket-po-empty {
+	padding: 20px 24px;
+}
+.bracket-po-empty p {
+	margin: 0;
+	color: #898d91;
+	font-size: 13px;
+	font-style: italic;
+}
+
+/* Taxonomy toggle visibility */
+.bracket-po-tax-toggle {
+	display: none;
+}
+.bracket-po-tax-toggle.bracket-po-visible {
+	display: flex;
+}
+
+/* Actions bar */
+.bracket-po-actions {
+	margin-top: 20px;
+	padding: 0;
+}
+.bracket-po-save-btn.button.button-primary {
+	padding: 4px 24px;
+	height: 36px;
+	font-size: 13px;
+	border-radius: 6px;
+}

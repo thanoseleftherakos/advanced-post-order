@@ -1,13 +1,13 @@
 (function($) {
 	'use strict';
 
-	if (typeof apo_tax_vars === 'undefined') {
+	if (typeof bracket_po_tax_vars === 'undefined') {
 		return;
 	}
 
-	var ajax_url = apo_tax_vars.ajax_url;
-	var nonce    = apo_tax_vars.nonce;
-	var i18n     = apo_tax_vars.i18n || {};
+	var ajax_url = bracket_po_tax_vars.ajax_url;
+	var nonce    = bracket_po_tax_vars.nonce;
+	var i18n     = bracket_po_tax_vars.i18n || {};
 
 	var previousOrder = null;
 	var debounceTimer = null;
@@ -26,18 +26,18 @@
 	function showNotice(type, message, undoCallback) {
 		var $p = $('<p></p>').text(message);
 		if (undoCallback) {
-			var $undo = $('<a href="#" class="apo-undo-link"></a>').text(i18n.undo || 'Undo');
+			var $undo = $('<a href="#" class="bracket-po-undo-link"></a>').text(i18n.undo || 'Undo');
 			$p.append(' ').append($undo);
 		}
-		var $notice = $('<div class="notice notice-' + type + ' apo-ajax-notice"></div>').append($p);
+		var $notice = $('<div class="notice notice-' + type + ' bracket-po-ajax-notice"></div>').append($p);
 		if (undoCallback) {
-			$notice.find('.apo-undo-link').on('click', function(e) {
+			$notice.find('.bracket-po-undo-link').on('click', function(e) {
 				e.preventDefault();
 				$notice.remove();
 				undoCallback();
 			});
 		}
-		$('.apo-ajax-notice').remove();
+		$('.bracket-po-ajax-notice').remove();
 		$('.wrap > h1, .wrap > .wp-header-end').first().after($notice);
 		setTimeout(function() {
 			$notice.fadeOut(300, function() { $(this).remove(); });
@@ -47,7 +47,7 @@
 	// Send order via AJAX
 	function saveOrder(serializedOrder, callback) {
 		$.post(ajax_url, {
-			action: 'apo_save_term_order',
+			action: 'bracket_po_save_term_order',
 			order: serializedOrder,
 			nonce: nonce
 		}, function(response) {
@@ -59,9 +59,9 @@
 
 	// ARIA live region for screen reader announcements
 	function announce(message) {
-		var $region = $('#apo-live-region');
+		var $region = $('#bracket-po-live-region');
 		if (!$region.length) {
-			$region = $('<div id="apo-live-region" class="screen-reader-text" aria-live="assertive" role="status"></div>');
+			$region = $('<div id="bracket-po-live-region" class="screen-reader-text" aria-live="assertive" role="status"></div>');
 			$('body').append($region);
 		}
 		$region.text(message);
@@ -82,7 +82,7 @@
 			items: 'tr',
 			axis: 'y',
 			helper: fixHelper,
-			placeholder: 'apo-sortable-placeholder',
+			placeholder: 'bracket-po-sortable-placeholder',
 			cursor: 'grabbing',
 			opacity: 0.8,
 			tolerance: 'pointer',
@@ -149,7 +149,7 @@
 
 		// Add drag cursor class and accessibility attributes
 		$list.find('tr').each(function() {
-			$(this).addClass('apo-draggable')
+			$(this).addClass('bracket-po-draggable')
 				.attr('tabindex', '0')
 				.attr('role', 'listitem');
 		});
@@ -165,7 +165,7 @@
 				keyboardActiveRow = $row;
 				keyboardOriginalIndex = $row.index();
 				previousOrder = $list.sortable('serialize');
-				$row.addClass('apo-keyboard-active');
+				$row.addClass('bracket-po-keyboard-active');
 				announce(i18n.keyboard_activated || 'Reorder mode activated. Use arrow keys to move, Enter to save, Escape to cancel.');
 				return;
 			}
@@ -201,7 +201,7 @@
 			// Enter: save
 			if (e.key === 'Enter') {
 				e.preventDefault();
-				$row.removeClass('apo-keyboard-active');
+				$row.removeClass('bracket-po-keyboard-active');
 				var savedPrev = previousOrder;
 				keyboardActiveRow = null;
 
@@ -229,7 +229,7 @@
 			// Escape: cancel
 			if (e.key === 'Escape') {
 				e.preventDefault();
-				$row.removeClass('apo-keyboard-active');
+				$row.removeClass('bracket-po-keyboard-active');
 				keyboardActiveRow = null;
 
 				var $rows = $list.find('tr');

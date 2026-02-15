@@ -1,4 +1,4 @@
-=== Advanced Post Order ===
+=== Bracket Post Order ===
 Contributors: bracket
 Tags: post order, custom order, drag and drop, taxonomy order, reorder
 Requires at least: 6.2
@@ -8,13 +8,13 @@ Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Drag-and-drop ordering for posts, pages, custom post types, and taxonomy terms — with per-category post ordering that other plugins don't offer.
+Drag-and-drop ordering for posts, pages, custom post types, and taxonomy terms — with per-category post ordering.
 
 == Description ==
 
-**Advanced Post Order** gives you complete control over how your content is sorted — directly from the native WordPress admin screens you already use. No new interfaces to learn, no separate reorder pages. Just drag and drop.
+**Bracket Post Order** gives you complete control over how your content is sorted — directly from the native WordPress admin screens you already use. No new interfaces to learn, no separate reorder pages. Just drag and drop.
 
-What sets this plugin apart is **per-term post ordering**: the ability to define a different post order for each individual category, tag, or custom taxonomy term. Show your products in one order on "Summer Collection" and a completely different order on "Best Sellers" — each term maintains its own independent sort.
+A key feature is **per-term post ordering**: the ability to define a different post order for each individual category, tag, or custom taxonomy term. Show your products in one order on "Summer Collection" and a completely different order on "Best Sellers" — each term maintains its own independent sort.
 
 = Three Types of Ordering =
 
@@ -40,7 +40,7 @@ Reorder categories, tags, and custom taxonomy terms themselves via drag-and-drop
 
 = How It Works =
 
-1. Go to **Settings > Advanced Post Order**
+1. Go to **Settings > Bracket Post Order**
 2. Toggle on the post types you want to reorder
 3. Toggle on taxonomies for per-term post ordering
 4. Toggle on taxonomies for term reordering
@@ -68,27 +68,27 @@ Changes save automatically via AJAX — no page refresh needed.
 
 = For Developers =
 
-Advanced Post Order provides hooks so you can extend or control its behavior:
+Bracket Post Order provides hooks so you can extend or control its behavior:
 
 `// Filter: skip per-term ordering for a specific query
-add_filter( 'apo_apply_term_post_order', function( $apply, $term_id, $query ) {
+add_filter( 'bracket_po_apply_term_post_order', function( $apply, $term_id, $query ) {
     // Return false to skip
     return $apply;
 }, 10, 3 );`
 
 `// Filter: modify the retrieved term post order
-add_filter( 'apo_get_term_post_order', function( $ordered_ids, $term_id ) {
+add_filter( 'bracket_po_get_term_post_order', function( $ordered_ids, $term_id ) {
     return $ordered_ids;
 }, 10, 2 );`
 
 `// Actions: fired after order is saved via drag-and-drop
-do_action( 'apo_global_order_updated', $post_ids );
-do_action( 'apo_term_post_order_updated', $term_id, $post_ids );
-do_action( 'apo_term_order_updated', $term_ids );`
+do_action( 'bracket_po_global_order_updated', $post_ids );
+do_action( 'bracket_po_term_post_order_updated', $term_id, $post_ids );
+do_action( 'bracket_po_term_order_updated', $term_ids );`
 
 `// Actions: fired after order is reset
-do_action( 'apo_global_order_reset', $post_type, $sort_by );
-do_action( 'apo_term_post_order_reset', $term_id );`
+do_action( 'bracket_po_global_order_reset', $post_type, $sort_by );
+do_action( 'bracket_po_term_post_order_reset', $term_id );`
 
 To apply per-term order in custom queries, set `orderby` to `menu_order` and include a `tax_query` with a single term:
 
@@ -110,20 +110,20 @@ The plugin will automatically apply the saved per-term order via `FIELD()` SQL �
 = Automatic Installation =
 
 1. In your WordPress admin, go to **Plugins > Add New**
-2. Search for "Advanced Post Order"
+2. Search for "Bracket Post Order"
 3. Click **Install Now**, then **Activate**
-4. Go to **Settings > Advanced Post Order** to configure
+4. Go to **Settings > Bracket Post Order** to configure
 
 = Manual Installation =
 
 1. Download the plugin ZIP file
-2. Upload the `advanced-post-order` folder to `/wp-content/plugins/`
+2. Upload the `bracket-post-order` folder to `/wp-content/plugins/`
 3. Activate the plugin through the **Plugins** menu
-4. Go to **Settings > Advanced Post Order** to configure
+4. Go to **Settings > Bracket Post Order** to configure
 
 = Configuration =
 
-1. Navigate to **Settings > Advanced Post Order**
+1. Navigate to **Settings > Bracket Post Order**
 2. In the **Post Types** card, toggle on each post type you want to reorder
 3. In the **Per-Term Post Ordering** card, toggle on taxonomies (taxonomies appear automatically based on your enabled post types)
 4. In the **Term Ordering** card, toggle on taxonomies whose terms you want to reorder
@@ -193,7 +193,7 @@ New posts that aren't part of the saved per-term order automatically appear at t
 
 = Is it compatible with Simple Custom Post Order (SCPO)? =
 
-The plugin detects SCPO and displays an admin notice recommending deactivation. If both are active, Advanced Post Order dequeues SCPO's scripts on pages where APO is active to prevent conflicts. For best results, deactivate SCPO before using this plugin.
+The plugin detects SCPO and displays an admin notice recommending deactivation. If both are active, Bracket Post Order dequeues SCPO's scripts on pages where it is active to prevent conflicts. For best results, deactivate SCPO before using this plugin.
 
 = Does it support multisite? =
 
@@ -230,8 +230,8 @@ Yes. The plugin works on individual sites within a multisite network. Each site 
 * Improved: Sortable helper has larger shadow and subtle scale
 * Improved: Focus ring styles for keyboard navigation
 * Updated: uninstall.php cleans up transients
-* Developer: New `apo_global_order_reset` action
-* Developer: New `apo_term_post_order_reset` action
+* Developer: New `bracket_po_global_order_reset` action
+* Developer: New `bracket_po_term_post_order_reset` action
 
 = 1.0.2 =
 * Fixed table layout during drag-and-drop on some environments
@@ -253,7 +253,7 @@ Yes. The plugin works on individual sites within a multisite network. Each site 
 * Transparent `WP_Query` integration via `pre_get_posts` and `posts_clauses`
 * Per-term ordering uses SQL `FIELD()` for native pagination support
 * Automatic conflict detection and script dequeuing for Simple Custom Post Order
-* Developer hooks: `apo_apply_term_post_order`, `apo_get_term_post_order`, `apo_global_order_updated`, `apo_term_post_order_updated`, `apo_term_order_updated`
+* Developer hooks: `bracket_po_apply_term_post_order`, `bracket_po_get_term_post_order`, `bracket_po_global_order_updated`, `bracket_po_term_post_order_updated`, `bracket_po_term_order_updated`
 * Clean uninstall — removes options and term meta on plugin deletion
 * Full internationalization support with `.pot` template
 
@@ -263,4 +263,4 @@ Yes. The plugin works on individual sites within a multisite network. Each site 
 Major feature update: reset order, undo, mobile/touch support, keyboard accessibility, WPML/Polylang compatibility, and performance optimizations. All free.
 
 = 1.0.0 =
-Initial release. If migrating from Simple Custom Post Order, your existing `menu_order` values are preserved — just enable the same post types in the APO settings.
+Initial release. If migrating from Simple Custom Post Order, your existing `menu_order` values are preserved — just enable the same post types in the Bracket Post Order settings.

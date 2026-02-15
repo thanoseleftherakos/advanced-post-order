@@ -5,15 +5,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * WPML compatibility for Advanced Post Order.
+ * WPML compatibility for Bracket Post Order.
  *
  * Maps term IDs and filters post IDs to the current language
  * so per-term ordering works correctly in multilingual sites.
  */
-class APO_Compat_WPML {
+class Bracket_PO_Compat_WPML {
 
 	public static function init() {
-		add_filter( 'apo_get_term_post_order', [ __CLASS__, 'filter_term_post_order' ], 10, 2 );
+		add_filter( 'bracket_po_get_term_post_order', [ __CLASS__, 'filter_term_post_order' ], 10, 2 );
 	}
 
 	/**
@@ -44,7 +44,7 @@ class APO_Compat_WPML {
 
 		if ( $default_term_id && $default_term_id !== $term_id ) {
 			// Get order from the default language term.
-			$default_order = APO_Core::get_term_order( $default_term_id );
+			$default_order = Bracket_PO_Core::get_term_order( $default_term_id );
 			if ( ! empty( $default_order ) && empty( $ordered_ids ) ) {
 				$ordered_ids = $default_order;
 			}

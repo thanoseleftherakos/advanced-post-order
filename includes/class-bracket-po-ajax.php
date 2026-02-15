@@ -4,33 +4,33 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class APO_Ajax {
+class Bracket_PO_Ajax {
 
 	public static function init() {
-		add_action( 'wp_ajax_apo_save_global_order', [ __CLASS__, 'save_global_order' ] );
-		add_action( 'wp_ajax_apo_save_term_post_order', [ __CLASS__, 'save_term_post_order' ] );
-		add_action( 'wp_ajax_apo_save_term_order', [ __CLASS__, 'save_term_order' ] );
-		add_action( 'wp_ajax_apo_reset_order', [ __CLASS__, 'reset_order' ] );
+		add_action( 'wp_ajax_bracket_po_save_global_order', [ __CLASS__, 'save_global_order' ] );
+		add_action( 'wp_ajax_bracket_po_save_term_post_order', [ __CLASS__, 'save_term_post_order' ] );
+		add_action( 'wp_ajax_bracket_po_save_term_order', [ __CLASS__, 'save_term_order' ] );
+		add_action( 'wp_ajax_bracket_po_reset_order', [ __CLASS__, 'reset_order' ] );
 	}
 
 	/**
 	 * Save global post order (menu_order).
 	 */
 	public static function save_global_order() {
-		check_ajax_referer( 'apo_nonce', 'nonce' );
+		check_ajax_referer( 'bracket_po_nonce', 'nonce' );
 
 		if ( ! current_user_can( 'edit_posts' ) ) {
-			wp_send_json_error( __( 'Permission denied.', 'advanced-post-order' ) );
+			wp_send_json_error( __( 'Permission denied.', 'bracket-post-order' ) );
 		}
 
 		if ( empty( $_POST['order'] ) ) {
-			wp_send_json_error( __( 'No order data received.', 'advanced-post-order' ) );
+			wp_send_json_error( __( 'No order data received.', 'bracket-post-order' ) );
 		}
 
 		parse_str( sanitize_text_field( wp_unslash( $_POST['order'] ) ), $data );
 
 		if ( empty( $data['post'] ) || ! is_array( $data['post'] ) ) {
-			wp_send_json_error( __( 'Invalid order data.', 'advanced-post-order' ) );
+			wp_send_json_error( __( 'Invalid order data.', 'bracket-post-order' ) );
 		}
 
 		$post_ids = array_map( 'absint', $data['post'] );
@@ -66,7 +66,7 @@ class APO_Ajax {
 			clean_post_cache( $post_id );
 		}
 
-		do_action( 'apo_global_order_updated', $post_ids );
+		do_action( 'bracket_po_global_order_updated', $post_ids );
 
 		wp_send_json_success();
 	}
@@ -75,28 +75,28 @@ class APO_Ajax {
 	 * Save per-term post order.
 	 */
 	public static function save_term_post_order() {
-		check_ajax_referer( 'apo_nonce', 'nonce' );
+		check_ajax_referer( 'bracket_po_nonce', 'nonce' );
 
 		if ( ! current_user_can( 'edit_posts' ) ) {
-			wp_send_json_error( __( 'Permission denied.', 'advanced-post-order' ) );
+			wp_send_json_error( __( 'Permission denied.', 'bracket-post-order' ) );
 		}
 
 		if ( empty( $_POST['order'] ) || empty( $_POST['term_id'] ) ) {
-			wp_send_json_error( __( 'Missing order data or term ID.', 'advanced-post-order' ) );
+			wp_send_json_error( __( 'Missing order data or term ID.', 'bracket-post-order' ) );
 		}
 
 		parse_str( sanitize_text_field( wp_unslash( $_POST['order'] ) ), $data );
 
 		if ( empty( $data['post'] ) || ! is_array( $data['post'] ) ) {
-			wp_send_json_error( __( 'Invalid order data.', 'advanced-post-order' ) );
+			wp_send_json_error( __( 'Invalid order data.', 'bracket-post-order' ) );
 		}
 
 		$term_id  = absint( $_POST['term_id'] );
 		$post_ids = array_map( 'absint', $data['post'] );
 
-		update_term_meta( $term_id, '_apo_order', $post_ids );
+		update_term_meta( $term_id, '_bracket_po_order', $post_ids );
 
-		do_action( 'apo_term_post_order_updated', $term_id, $post_ids );
+		do_action( 'bracket_po_term_post_order_updated', $term_id, $post_ids );
 
 		wp_send_json_success();
 	}
@@ -105,20 +105,20 @@ class APO_Ajax {
 	 * Save taxonomy term order.
 	 */
 	public static function save_term_order() {
-		check_ajax_referer( 'apo_nonce', 'nonce' );
+		check_ajax_referer( 'bracket_po_nonce', 'nonce' );
 
 		if ( ! current_user_can( 'manage_categories' ) ) {
-			wp_send_json_error( __( 'Permission denied.', 'advanced-post-order' ) );
+			wp_send_json_error( __( 'Permission denied.', 'bracket-post-order' ) );
 		}
 
 		if ( empty( $_POST['order'] ) ) {
-			wp_send_json_error( __( 'No order data received.', 'advanced-post-order' ) );
+			wp_send_json_error( __( 'No order data received.', 'bracket-post-order' ) );
 		}
 
 		parse_str( sanitize_text_field( wp_unslash( $_POST['order'] ) ), $data );
 
 		if ( empty( $data['tag'] ) || ! is_array( $data['tag'] ) ) {
-			wp_send_json_error( __( 'Invalid order data.', 'advanced-post-order' ) );
+			wp_send_json_error( __( 'Invalid order data.', 'bracket-post-order' ) );
 		}
 
 		$term_ids = array_map( 'absint', $data['tag'] );
@@ -159,7 +159,7 @@ class APO_Ajax {
 			clean_term_cache( $term_id );
 		}
 
-		do_action( 'apo_term_order_updated', $term_ids );
+		do_action( 'bracket_po_term_order_updated', $term_ids );
 
 		wp_send_json_success();
 	}
@@ -168,10 +168,10 @@ class APO_Ajax {
 	 * Reset post order (global or per-term).
 	 */
 	public static function reset_order() {
-		check_ajax_referer( 'apo_nonce', 'nonce' );
+		check_ajax_referer( 'bracket_po_nonce', 'nonce' );
 
 		if ( ! current_user_can( 'edit_posts' ) ) {
-			wp_send_json_error( __( 'Permission denied.', 'advanced-post-order' ) );
+			wp_send_json_error( __( 'Permission denied.', 'bracket-post-order' ) );
 		}
 
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized below.
@@ -181,17 +181,17 @@ class APO_Ajax {
 		if ( $reset_type === 'term' ) {
 			$term_id = isset( $_POST['term_id'] ) ? absint( $_POST['term_id'] ) : 0;
 			if ( ! $term_id ) {
-				wp_send_json_error( __( 'Invalid term ID.', 'advanced-post-order' ) );
+				wp_send_json_error( __( 'Invalid term ID.', 'bracket-post-order' ) );
 			}
 
-			delete_term_meta( $term_id, '_apo_order' );
+			delete_term_meta( $term_id, '_bracket_po_order' );
 
 			/**
 			 * Fires after per-term post order is reset.
 			 *
 			 * @param int $term_id The term ID.
 			 */
-			do_action( 'apo_term_post_order_reset', $term_id );
+			do_action( 'bracket_po_term_post_order_reset', $term_id );
 
 			wp_send_json_success();
 		}
@@ -199,12 +199,12 @@ class APO_Ajax {
 		if ( $reset_type === 'global' ) {
 			$post_type = isset( $_POST['post_type'] ) ? sanitize_key( $_POST['post_type'] ) : '';
 			if ( empty( $post_type ) ) {
-				wp_send_json_error( __( 'Invalid post type.', 'advanced-post-order' ) );
+				wp_send_json_error( __( 'Invalid post type.', 'bracket-post-order' ) );
 			}
 
-			$enabled = APO_Core::get_enabled_post_types();
+			$enabled = Bracket_PO_Core::get_enabled_post_types();
 			if ( ! in_array( $post_type, $enabled, true ) ) {
-				wp_send_json_error( __( 'Post type not enabled.', 'advanced-post-order' ) );
+				wp_send_json_error( __( 'Post type not enabled.', 'bracket-post-order' ) );
 			}
 
 			global $wpdb;
@@ -254,11 +254,11 @@ class APO_Ajax {
 			 * @param string $post_type The post type.
 			 * @param string $sort_by   The sort method used.
 			 */
-			do_action( 'apo_global_order_reset', $post_type, $sort_by );
+			do_action( 'bracket_po_global_order_reset', $post_type, $sort_by );
 
 			wp_send_json_success();
 		}
 
-		wp_send_json_error( __( 'Invalid reset type.', 'advanced-post-order' ) );
+		wp_send_json_error( __( 'Invalid reset type.', 'bracket-post-order' ) );
 	}
 }

@@ -5,15 +5,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Polylang compatibility for Advanced Post Order.
+ * Polylang compatibility for Bracket Post Order.
  *
  * Maps term IDs and filters post IDs to the current language
  * so per-term ordering works correctly in multilingual sites.
  */
-class APO_Compat_Polylang {
+class Bracket_PO_Compat_Polylang {
 
 	public static function init() {
-		add_filter( 'apo_get_term_post_order', [ __CLASS__, 'filter_term_post_order' ], 10, 2 );
+		add_filter( 'bracket_po_get_term_post_order', [ __CLASS__, 'filter_term_post_order' ], 10, 2 );
 	}
 
 	/**
@@ -44,7 +44,7 @@ class APO_Compat_Polylang {
 			$default_term_id = pll_get_term( $term_id, $default_language );
 
 			if ( $default_term_id && $default_term_id !== $term_id ) {
-				$default_order = APO_Core::get_term_order( $default_term_id );
+				$default_order = Bracket_PO_Core::get_term_order( $default_term_id );
 				if ( ! empty( $default_order ) && empty( $ordered_ids ) ) {
 					$ordered_ids = $default_order;
 				}
